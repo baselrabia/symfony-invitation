@@ -3,10 +3,16 @@
 namespace App\Repository;
 
 use App\Entity\Invitation;
+use App\Traits\getUserTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\User;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
 
 /**
  * @extends ServiceEntityRepository<Invitation>
@@ -18,9 +24,22 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class InvitationRepository extends ServiceEntityRepository
 {
+    use getUserTrait;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Invitation::class);
+    }
+
+
+    public function listSenderInvitations(User $user, $status)
+    {
+       return $user->getSendInvitations();
+    }
+
+    public function listInvitedInvitations(User $user, $status)
+    {
+        return $user->getReceivedInvitations();
     }
 
     /**
@@ -75,4 +94,69 @@ class InvitationRepository extends ServiceEntityRepository
         ;
     }
     */
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    public function create(User $user, array $data): Invitation
+    {
+        $invitation = new Invitation();
+        $invitation->setTitle($data['title']);
+        $invitation->setContent($data['content']);
+        $invitation->setSenderStatus("send");
+
+        $invite = $this->getInviteUser($data['invite']);
+        $invitation->setInvited($invite);
+
+        $user->addSendInvitation($invitation);
+
+        $this->add($invitation);
+        return $invitation;
+    }
+
+    private function getInviteUser($email): User
+    {
+        $userRepo = $this->_em->getRepository(User::class);
+        return $this->findOrCreate($userRepo, $email);
+    }
+
+    /**
+     * @throws NonUniqueResultException
+     * @throws AccessDeniedHttpException
+     */
+    public function getEntity($user, $id): ?Invitation
+    {
+          $entity =  $this->createQueryBuilder('i')
+                ->andWhere('i.id = :val')
+                ->setParameter('val', $id)
+                ->getQuery()
+                ->getOneOrNullResult();
+
+          if($entity){
+              $sender = $entity->getSender()->getEmail();
+              $invited = $entity->getInvited()->getEmail();
+              $authorize =  $user->getEmail()  == $sender ||  $user->getEmail()  == $invited ;
+              if ($authorize) {
+                  return $entity;
+              }
+              Throw new AccessDeniedHttpException("UnAuthorized access to the Entity " . $id);
+          }
+        return null;
+    }
+
+    /**
+     * @throws NonUniqueResultException
+     */
+    public function cancel($user, $id)
+    {
+        $entity  = $this->getEntity($user, $id);
+        if(! $entity){
+            throw new NotFoundHttpException("there is no entity with that id " . $id);
+        }
+        $entity->setSenderStatus("cancel");
+        $this->_em->flush();
+
+        return $entity;
+    }
+
 }

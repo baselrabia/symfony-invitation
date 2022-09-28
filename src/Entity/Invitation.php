@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=InvitationRepository::class)
+ * @ORM\HasLifecycleCallbacks
  */
 class Invitation
 {
@@ -30,16 +31,6 @@ class Invitation
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $send_by;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $send_to;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
     private $sender_status;
 
     /**
@@ -48,14 +39,26 @@ class Invitation
     private $invited_status;
 
     /**
-     * @ORM\Column(type="datetime_immutable")
+     * @ORM\Column(type="datetime")
      */
     private $created_at;
 
     /**
-     * @ORM\Column(type="datetime_immutable")
+     * @ORM\Column(type="datetime")
      */
     private $updated_at;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="sendInvitations")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $sender;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="receivedInvitations")
+     */
+    private $invited;
+
 
     public function getId(): ?int
     {
@@ -86,30 +89,6 @@ class Invitation
         return $this;
     }
 
-    public function getSendBy(): ?string
-    {
-        return $this->send_by;
-    }
-
-    public function setSendBy(string $send_by): self
-    {
-        $this->send_by = $send_by;
-
-        return $this;
-    }
-
-    public function getSendTo(): ?string
-    {
-        return $this->send_to;
-    }
-
-    public function setSendTo(string $send_to): self
-    {
-        $this->send_to = $send_to;
-
-        return $this;
-    }
-
     public function getSenderStatus(): ?string
     {
         return $this->sender_status;
@@ -134,27 +113,72 @@ class Invitation
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->created_at;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $created_at): self
+    public function setCreatedAt(\DateTime $created_at): self
     {
         $this->created_at = $created_at;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updated_at;
     }
 
-    public function setUpdatedAt(\DateTimeImmutable $updated_at): self
+    public function setUpdatedAt(\DateTime $updated_at): self
     {
         $this->updated_at = $updated_at;
 
         return $this;
     }
+
+    public function getSender(): ?User
+    {
+        return $this->sender;
+    }
+
+    public function setSender(?User $sender): self
+    {
+        $this->sender = $sender;
+
+        return $this;
+    }
+
+    public function getInvited(): ?User
+    {
+        return $this->invited;
+    }
+
+    public function setInvited(?User $invited): self
+    {
+        $this->invited = $invited;
+
+        return $this;
+    }
+    /**
+     * Gets triggered only on insert
+
+     * @ORM\PrePersist
+     */
+    public function onPrePersist()
+    {
+        $this->created_at = new \DateTime("now");
+        $this->updated_at = new \DateTime("now");
+    }
+
+    /**
+     * Gets triggered every time on update
+
+     * @ORM\PreUpdate
+     */
+    public function onPreUpdate()
+    {
+        $this->updated_at = new \DateTime("now");
+    }
+
 }
