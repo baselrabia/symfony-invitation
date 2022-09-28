@@ -15,12 +15,12 @@ class InvitationService
         $this->invitationRepo = $invitationRepository;
     }
 
-    public function listSenderInvitations(User $user,String $status)
+    public function listSenderInvitations(User $user, string $status)
     {
-        return  $this->invitationRepo->listSenderInvitations($user, $status);
+        return $this->invitationRepo->listSenderInvitations($user, $status);
     }
 
-    public function listInvitedInvitations(User $user,String $status)
+    public function listInvitedInvitations(User $user, string $status)
     {
         return $this->invitationRepo->listInvitedInvitations($user, $status);
     }
@@ -40,7 +40,18 @@ class InvitationService
      */
     public function cancelInvitation($user, $id)
     {
-       return $this->invitationRepo->cancel($user, $id);
+        return $this->invitationRepo->cancel($user, $id);
+    }
+
+    public function acceptInvitation($user, $id)
+    {
+        return $this->invitationRepo->accept($user, $id);
+    }
+
+    public function rejectInvitation($user, $id)
+    {
+        return $this->invitationRepo->reject($user, $id);
+
     }
 
 }

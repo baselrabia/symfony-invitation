@@ -69,7 +69,7 @@ class InvitationController extends ApiController
             $data = $this->invitationService->getInvitation($this->authUser, $id);
         } catch (\Exception $e) {
             return $this->setStatusCode($e->getStatusCode())
-                ->respondWithErrors(["msg" => $e->getMessage()]);
+                ->respondWithErrors($e->getMessage());
         }
 
         return $this->json([
@@ -86,10 +86,10 @@ class InvitationController extends ApiController
         $this->Authorize();
 
         try {
-            $data =  $this->invitationService->cancelInvitation($this->authUser, $id);
+            $data = $this->invitationService->cancelInvitation($this->authUser, $id);
         } catch (\Exception $e) {
             return $this->setStatusCode($e->getStatusCode())
-                ->respondWithErrors(["msg" => $e->getMessage()]);
+                ->respondWithErrors($e->getMessage());
         }
 
         return $this->json([

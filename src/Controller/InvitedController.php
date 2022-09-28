@@ -38,26 +38,40 @@ class InvitedController extends ApiController
     /**
      * @Route("/invitation/{id}/accept", methods="PATCH", name="accept Invitation" )
      */
-    public function accept(): Response
+    public function accept($id): Response
     {
         $this->Authorize();
 
+        try {
+            $data = $this->invitationService->acceptInvitation($this->authUser, $id);
+        } catch (\Exception $e) {
+            return $this->setStatusCode($e->getStatusCode())
+                ->respondWithErrors($e->getMessage());
+        }
+
         return $this->json([
-            'message' => 'acceptable!',
-            'path' => 'src/Controller/Invitation2Controller.php',
+            'message' => 'success cancel for invitation ' . $id,
+            'data' => InvitationResponse::Resource($data),
         ]);
     }
 
     /**
      * @Route("/invitation/{id}/reject", methods="PATCH", name="reject Invitation" )
      */
-    public function reject(): Response
+    public function reject($id): Response
     {
         $this->Authorize();
 
+        try {
+            $data = $this->invitationService->rejectInvitation($this->authUser, $id);
+        } catch (\Exception $e) {
+            return $this->setStatusCode($e->getStatusCode())
+                ->respondWithErrors($e->getMessage());
+        }
+
         return $this->json([
-            'message' => 'reject !',
-            'path' => 'src/Controller/Invitation2Controller.php',
+            'message' => 'success cancel for invitation ' . $id,
+            'data' => InvitationResponse::Resource($data),
         ]);
     }
 }
