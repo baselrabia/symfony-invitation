@@ -113,11 +113,11 @@ class InvitationService
             ],
             'accept' => [
                 "value" => $currentUser == $invited && $senderStatus == "send",
-                "err_msg" => "Invitation is canceled while trying to Accept the invitation"
+                "err_msg" => "unable to Accept the invitation"
             ],
             'reject' => [
                 "value" => $currentUser == $invited && $senderStatus == "send",
-                "err_msg" => "Invitation is canceled while trying to Reject the invitation"
+                "err_msg" => "unable to Reject the invitation"
             ],
         ];
 

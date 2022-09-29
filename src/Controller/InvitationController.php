@@ -34,7 +34,7 @@ class InvitationController extends ApiController
     {
         $this->Authorize();
 
-        $data = $this->invitationService->listSenderInvitations($this->authUser, "all");
+        $data = $this->invitationService->listSenderInvitations($this->authUser, $_GET['status'] ?? "all");
 
         return $this->json([
             'message' => 'Retrieve Successfully',

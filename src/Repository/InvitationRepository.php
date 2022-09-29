@@ -12,6 +12,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use App\Entity\User;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Doctrine\Common\Collections\Collection;
 
 
 /**
@@ -32,14 +33,35 @@ class InvitationRepository extends ServiceEntityRepository
     }
 
 
-    public function listSenderInvitations(User $user, $status)
+    public function listSenderInvitations(User $user, $status): Collection
     {
-        return $user->getSendInvitations();
+         $collection = $user->getSendInvitations();
+
+        if ($status != 'all') {
+            $status = substr(trim($status) ,0, -2);
+            $collection = $collection->filter(function ($entry) use ($status) {
+                 return $entry->getSenderStatus() == $status ||
+                     $entry->getInvitedStatus() == $status;
+             });
+         }
+
+         return $collection;
+
     }
 
-    public function listInvitedInvitations(User $user, $status)
+    public function listInvitedInvitations(User $user, $status): Collection
     {
-        return $user->getReceivedInvitations();
+        $collection = $user->getReceivedInvitations();
+
+        if ($status != 'all') {
+            $status = substr(trim($status) ,0, -2);
+            $collection = $collection->filter(function ($entry) use ($status) {
+                return $entry->getSenderStatus() == $status ||
+                    $entry->getInvitedStatus() == $status;
+            });
+        }
+
+        return $collection;
     }
 
     /**
@@ -78,8 +100,7 @@ class InvitationRepository extends ServiceEntityRepository
         $invitation->setSenderStatus("send");
 
         $invite = $this->getInviteUser($data['invite']);
-        $invitation->setInvited($invite);
-
+        $invite->addReceivedInvitation($invitation);
         $user->addSendInvitation($invitation);
 
         $this->add($invitation);
