@@ -17,7 +17,11 @@ Invited.
 - `git clone https://github.com/baselrabia/symfony-invitation.git`
 - `cd symfony-invitation`
 - `composer install`
-- `php -S localhost:9000 -t public/`
+-  edit the `.env` file and add your `DATABASE_URL`
+-  run `php bin/console doctrine:database:create` to create your DB
+-  run `php bin/console doctrine:migrations:migrate` to create the tables
+-  run `php -S localhost:9000 -t public/` start the server 
+-  go to the [API Collection](#api-collection) Section and hit the APIS
 
 
 ## # Testing
@@ -25,9 +29,12 @@ Invited.
 so you need to install sqlite extension to be able to test the testcases 
 - run `sudo apt-get install php7.4-sqlite`
 - ` php bin/phpunit`
+
 ### why use In-memory DB for testing ? 
 Testing code that interacts with a database can be a massive pain. Some developers mock database abstractions, and thus do not test the actual query. Others create a test database for the development environment, but this can also be a pain when it comes to continuous integration and maintaining the state of this database
 In-memory databases are an alternative to these options. As they exist only in the memory of the application, they are truly disposable and great for testing.
+
+
 ## API Collection
 ### Link: [Symfony Invitation Postman API Collection](https://documenter.getpostman.com/view/21704805/2s83maLQwy)
 - using header field "login_by" to auth as a user, it's workaround as authentication is not our focus for now.
