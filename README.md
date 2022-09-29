@@ -11,6 +11,7 @@ Invited.
 - Symfony Framework (version 4.4)
 - MySQL Database
 - PHPUnit Testing Framework
+- sqlite In-memory DB for Testing
 
 ## # Setup
 - `git clone https://github.com/baselrabia/symfony-invitation.git`
@@ -20,7 +21,12 @@ Invited.
 
 
 ## # Testing
+- tests are running In-memory
+so you need to install sqlite extension to be able to test the testcases 
+- run `sudo apt-get install php7.4-sqlite`
 - ` php bin/phpunit`
-
+### why use In-memory DB for testing ? 
+Testing code that interacts with a database can be a massive pain. Some developers mock database abstractions, and thus do not test the actual query. Others create a test database for the development environment, but this can also be a pain when it comes to continuous integration and maintaining the state of this database
+In-memory databases are an alternative to these options. As they exist only in the memory of the application, they are truly disposable and great for testing.
 ## API Collection
 ### [Symfony Invitation Postman API Collection](https://documenter.getpostman.com/view/21704805/2s83maLQwy)
