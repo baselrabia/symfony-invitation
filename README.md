@@ -17,7 +17,7 @@ Invited.
 - `git clone https://github.com/baselrabia/symfony-invitation.git`
 - `cd symfony-invitation`
 - `composer install`
-- ` php -S localhost:9000 -t public/`
+- `php -S localhost:9000 -t public/`
 
 
 ## # Testing
