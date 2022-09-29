@@ -50,7 +50,7 @@ class InvitedController extends ApiController
         }
 
         return $this->json([
-            'message' => 'success cancel for invitation ' . $id,
+            'message' => 'success accept for invitation ' . $id,
             'data' => InvitationResponse::Resource($data),
         ]);
     }
@@ -70,7 +70,7 @@ class InvitedController extends ApiController
         }
 
         return $this->json([
-            'message' => 'success cancel for invitation ' . $id,
+            'message' => 'success reject for invitation ' . $id,
             'data' => InvitationResponse::Resource($data),
         ]);
     }

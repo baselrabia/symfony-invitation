@@ -73,7 +73,7 @@ class InvitationController extends ApiController
         }
 
         return $this->json([
-            'message' => 'Created Successfully',
+            'message' => 'Retrieve Successfully',
             'data' => InvitationResponse::Resource($data),
         ]);
     }
