@@ -6,14 +6,23 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 abstract class BaseRequest
 {
     protected $validator;
+    protected $request;
     private $fields;
+    /**
+     * @var \Symfony\Component\HttpFoundation\HeaderBag
+     */
+    public $headers;
 
-    public function __construct(ValidatorInterface $validator)
+
+    public function __construct(ValidatorInterface $validator, RequestStack $requestStack)
     {
+        $this->request = $requestStack->getCurrentRequest();
+
         $this->fields = $this->rules();
         $this->validator = $validator;
         $this->populate();
@@ -21,6 +30,7 @@ abstract class BaseRequest
         if ($this->autoValidateRequest()) {
             $this->validate();
         }
+        $this->headers = $this->request->headers;
     }
 
     public function validate()
@@ -71,7 +81,7 @@ abstract class BaseRequest
             $this->{$property} = "";
         }
 
-        foreach ($this->getRequest()->request->all() as $property => $value) {
+        foreach ($this->request->request->all() as $property => $value) {
             if (property_exists($this, $property)) {
                 $this->{$property} = $value;
             }

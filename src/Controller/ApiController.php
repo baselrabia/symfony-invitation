@@ -4,29 +4,36 @@ namespace App\Controller;
  use App\Traits\getUserTrait;
  use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
  use Symfony\Component\HttpFoundation\JsonResponse;
+ use Symfony\Component\HttpFoundation\Request;
+ use Symfony\Component\HttpFoundation\RequestStack;
 
  class ApiController extends AbstractController
 {
     use getUserTrait;
 
     protected $authUser;
+     /**
+      * @var Request
+      */
+     private $request;
 
 
-
-     public function Authorize(){
+     public function Authorize($request)
+     {
+         $this->request= $request;
          $this->checkAuthUser();
-
-    }
+     }
 
      public function checkAuthUser()
      {
-         if(!isset(getallheaders()['login_by'])){
+        $login_by = $this->request->headers->get('login_by');
+
+         if(!$login_by){
              $response = $this->respondUnauthorized('Missed Header Field \'login_by\' to authenticate a user');
              $response->send();
-             exit;
          }
 
-         $this->authUser = $this->getUserWithEmail(getallheaders()['login_by']);
+         $this->authUser = $this->getUserWithEmail($login_by);
      }
 
      /**
