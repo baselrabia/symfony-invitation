@@ -6,6 +6,7 @@ use App\Repository\InvitationRepository;
 use App\Response\InvitationResponse;
 use App\Service\InvitationService;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -14,18 +15,24 @@ class InvitedController extends ApiController
 {
 
     private $invitationService;
+    /**
+     * @var \Symfony\Component\HttpFoundation\Request|null
+     */
+    private $request;
 
-    public function __construct(InvitationService $invitationRepository)
+    public function __construct(InvitationService $invitationRepository, RequestStack $requestStack)
     {
+        $this->request = $requestStack->getCurrentRequest();
         $this->invitationService = $invitationRepository;
     }
+
 
     /**
      * @Route("/invitations/received", name="List received Invitations", methods={"GET"})
      */
     public function index(): JsonResponse
     {
-        $this->Authorize();
+        $this->Authorize($this->request);
 
         $data = $this->invitationService->listInvitedInvitations($this->authUser, $_GET['status'] ?? "all");
 
@@ -40,7 +47,7 @@ class InvitedController extends ApiController
      */
     public function accept($id): Response
     {
-        $this->Authorize();
+        $this->Authorize($this->request);
 
         try {
             $data = $this->invitationService->acceptInvitation($this->authUser, $id);
@@ -60,7 +67,7 @@ class InvitedController extends ApiController
      */
     public function reject($id): Response
     {
-        $this->Authorize();
+        $this->Authorize($this->request);
 
         try {
             $data = $this->invitationService->rejectInvitation($this->authUser, $id);
